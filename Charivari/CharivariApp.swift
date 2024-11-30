@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct CharivariApp: App {
+    let network = NetworkMonitor.shared
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MenuView(network: network)
         }
     }
 }

@@ -1,0 +1,58 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Charivari" : {
+      "shouldTranslate" : false
+    },
+    "Play" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouer"
+          }
+        }
+      }
+    },
+    "Ranking" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classement"
+          }
+        }
+      }
+    },
+    "Time:" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps:"
+          }
+        }
+      }
+    },
+    "Time: %@" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temps: "
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
