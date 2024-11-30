@@ -12,12 +12,19 @@ struct MenuView: View {
     @State var inRanking = false
     @State private var path: [String] = []
     @StateObject private var fetchWord = FetchWord()
-    
+    @StateObject private var game = GameManager(username: "abc")
+    @State private var orderedLetters: [Letter] = []
+    @State private var placedLetters: [Letter] = []
     let network: NetworkMonitor
     
     init(network: NetworkMonitor) {
         self.network = network
-        
+        let tempWord = Word(Word: "mi", Secret: "123", Error: "")
+        game.setWord(word: tempWord)
+        orderedLetters = game.orderedLetters
+        for _ in orderedLetters{
+            placedLetters.append(Letter(id: -1, text: " ", offset: .zero))
+        }
     }
     
     var body: some View {
@@ -51,7 +58,7 @@ struct MenuView: View {
                             .buttonBorderShape(.circle)
                     }
                     
-                    NavigationLink(destination: GameView(fetchWord: fetchWord).navigationBarBackButtonHidden(true), isActive: $isPlaying) {
+                    NavigationLink(destination: GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters).navigationBarBackButtonHidden(true), isActive: $isPlaying) {
                         EmptyView()
                     }
                     

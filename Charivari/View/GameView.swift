@@ -7,19 +7,21 @@
 import SwiftUI
 
 struct GameView: View {
-    @ObservedObject var word: FetchWord
-    @ObservedObject var game: GameManager
-    @ObservedObject var timer = TimerManager()
-    @State var letters: Array<Letter>
-    @State var letOffset: CGSize = .zero
+    //@ObservedObject var word: FetchWord
+    var game: GameManager
+    @State var orderedLetters: [Letter]
+    @ObservedObject var timer = TimerManager.shared
+    @State var placedLetters: [Letter]
+    //@State var letOffset: CGSize = .zero
     
+    /*
     init(fetchWord: FetchWord) {
         self.word = fetchWord
         game = GameManager(username: "abc")
         letters = []
         timer.start()
         getNewWord()
-    }
+    }*/
     var body: some View {
         NavigationStack {
             ZStack{
@@ -38,6 +40,7 @@ struct GameView: View {
             }
         }
     }
+    /*
     func getNewWord() {
         Task {
             //let tempWord =  await word.getWord(difficulty: "1")
@@ -46,11 +49,11 @@ struct GameView: View {
             game.setWord(word: tempWord)
             letters = game.orderedLetters
         }
-    }
+    }*/
 }
 
 #Preview {
-    GameView(fetchWord: FetchWord())
+    GameView(game: GameManager(username: "abc"), orderedLetters: ([Letter(id: 1, text: "a", offset: .zero), Letter(id: 2, text: "b", offset: .zero), Letter(id: 3, text: "c", offset: .zero)]), placedLetters: ([Letter(id: -1, text: " ", offset: .zero), Letter(id: -1, text: " ", offset: .zero), Letter(id: -1, text: " ", offset: .zero)]))
 }
 
 private extension GameView {
@@ -67,28 +70,23 @@ private extension GameView {
         Grid {
             GridRow {
                 
-                ForEach(game.getOrderedLetters(), id: \.id) { letter in
-                    
-                    
+                ForEach($orderedLetters, id: \.id) { $letter in
                     Text("\(letter.text)")
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.center)
                         .padding()
                         .frame(width: 50, height: 50)
                         .background(letterRec)
-                        .offset(letOffset)
+                        .offset(letter.offset)
                         .gesture(
                             DragGesture()
                                 .onChanged { drag in
-                                    game.updateOffset(id: letter.id, offset: drag.translation)
-                                    letOffset = drag.translation
+                                    letter.offset = drag.translation
                                 }
                                 .onEnded { drag in
-                                    game.updateOffset(id: letter.id, offset: .zero)
-                                    letOffset = .zero
+                                    letter.offset = .zero
                                 }
                         )
-                        
                 }
             }
             .frame(width: 75, height: 75)
@@ -98,7 +96,7 @@ private extension GameView {
     var emptyBoxes: some View {
         Grid {
             GridRow {
-                ForEach(game.placedLetters, id: \.self) { letter in
+                ForEach($placedLetters, id: \.id) { $letter in
                     Text("")
                         .fixedSize(horizontal: false, vertical: true)
                         .multilineTextAlignment(.center)
