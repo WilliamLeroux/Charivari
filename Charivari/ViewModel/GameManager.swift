@@ -30,7 +30,6 @@ class GameManager : ObservableObject{
         } else {
                 game = Game(username: username, time: 0.0, isFound: false)
         }
-        
     }
     
     func setWord(word: Word) {
@@ -99,8 +98,24 @@ class GameManager : ObservableObject{
         
     }
     
+    func checkLetterDrag(letter: Letter, placedLetters: [Letter]){
+        var tempPoint = CGPoint(x: letter.offset.width, y: letter.offset.height)
+        var index = 0
+        var letterHover: Bool = false
+        for tempLetter in placedLetters {
+            if (tempLetter.lastOffset.contains(tempPoint)) {
+                letterHover = true
+                break
+            }
+            index += 1
+        }
+        if (letterHover) {
+            
+        }
+        
+    }
+    
     private func saveWord() {
         UserDefaults.standard.set(game, forKey: "game")
     }
-    
 }

@@ -15,6 +15,7 @@ struct MenuView: View {
     @StateObject private var game = GameManager(username: "abc")
     @State private var orderedLetters: [Letter] = []
     @State private var placedLetters: [Letter] = []
+    @State private var buttonFrame: [CGRect] = []
     let network: NetworkMonitor
     
     init(network: NetworkMonitor) {
@@ -24,6 +25,7 @@ struct MenuView: View {
         orderedLetters = game.orderedLetters
         for _ in orderedLetters{
             placedLetters.append(Letter(id: -1, text: " ", offset: .zero))
+            buttonFrame.append(.zero)
         }
     }
     
@@ -58,7 +60,7 @@ struct MenuView: View {
                             .buttonBorderShape(.circle)
                     }
                     
-                    NavigationLink(destination: GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters).navigationBarBackButtonHidden(true), isActive: $isPlaying) {
+                    NavigationLink(destination: GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters, buttonFrame: buttonFrame).navigationBarBackButtonHidden(true), isActive: $isPlaying) {
                         EmptyView()
                     }
                     

@@ -5,7 +5,6 @@
 //  Created by William Leroux on 2024-11-28.
 //
 
-
 struct Game: Encodable{
     var username: String
     var word: Word?

@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "Charivari" : {
       "shouldTranslate" : false
     },
@@ -44,6 +47,7 @@
       }
     },
     "Time: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr-CA" : {
           "stringUnit" : {
