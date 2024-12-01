@@ -23,7 +23,6 @@ struct GameView: View {
                         .foregroundColor(.black)
                         .fontWeight(.bold)
                         .padding()
-                    //emptyBoxes
                     letterBoxes
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -38,7 +37,7 @@ struct GameView: View {
 
 private extension GameView {
     var backgroundVw: some View {
-        Image(.background)
+        Image(.background4)
             .resizable()
             .scaledToFill()
             .ignoresSafeArea(.all)
@@ -67,7 +66,7 @@ private extension GameView {
                                 }
                             )
                             .onTapGesture {
-                                
+                                letterTapped(letter: letter)
                             }
                     }
                 }
@@ -114,6 +113,7 @@ private extension GameView {
         if (letter.text != " ") {
             let match = orderedLetters.firstIndex(where: { $0.text == letter.text && !$0.isShown})
             orderedLetters[match!].isShown = true
+            placedLetters[letter.id].text = " "
         }
     }
     
@@ -122,7 +122,6 @@ private extension GameView {
             $0.contains(location) }) {
             if (dropped) {
                 placedLetters[match].text = letter.text
-                placedLetters[match].dragState = .unknown
                 orderedLetters[letter.id].isShown = false
             }
             return .good

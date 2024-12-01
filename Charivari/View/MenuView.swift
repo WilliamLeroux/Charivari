@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MenuView: View {
+    @StateObject private var timer = TimerManager.shared
     @State var isPlaying = false
     @State var inRanking = false
     @State private var path: [String] = []
@@ -27,6 +28,7 @@ struct MenuView: View {
             placedLetters.append(Letter(id: -1, text: " ", offset: .zero))
             buttonFrame.append(.zero)
         }
+        timer.start()
     }
     
     var body: some View {
@@ -48,6 +50,7 @@ struct MenuView: View {
                 VStack{
                     Text("Charivari")
                         .font(.title)
+                        .fontWeight(.bold)
                     Spacer()
                         .frame(height: 40)
                     Button(action: play) {
@@ -61,7 +64,6 @@ struct MenuView: View {
                     }
                     
                     NavigationLink(destination: GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters, buttonFrame: buttonFrame).navigationBarBackButtonHidden(true), isActive: $isPlaying) {
-                        EmptyView()
                     }
                     
                     Spacer()
@@ -105,7 +107,7 @@ struct MenuView: View {
 
 private extension MenuView {
     var backgroundVw: some View {
-        Image(.background)
+        Image(.background4)
             .resizable()
             .scaledToFill()
             .ignoresSafeArea(.all)

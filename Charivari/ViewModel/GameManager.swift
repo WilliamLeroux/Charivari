@@ -94,24 +94,17 @@ class GameManager : ObservableObject{
         return game.word?.Word.count ?? 0
     }
     
-    func startTimer() {
-        
-    }
-    
-    func checkLetterDrag(letter: Letter, placedLetters: [Letter]){
-        var tempPoint = CGPoint(x: letter.offset.width, y: letter.offset.height)
-        var index = 0
-        var letterHover: Bool = false
-        for tempLetter in placedLetters {
-            if (tempLetter.lastOffset.contains(tempPoint)) {
-                letterHover = true
-                break
-            }
-            index += 1
+    func checkWord(letterArray: [Letter]) -> Bool{
+        var tempWord : String = ""
+        for letter in letterArray {
+            tempWord.append(letter.text)
         }
-        if (letterHover) {
+        if (tempWord == game.word!.Word) {
             
         }
+    }
+    
+    func startTimer() {
         
     }
     
