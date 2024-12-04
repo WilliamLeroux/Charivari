@@ -22,11 +22,19 @@ class TimerManager: ObservableObject {
         timer.invalidate()
     }
     
+    func reset() {
+        time = 0.0
+    }
+    
     func setTime(time: Double)  {
         self.time += time
     }
     
     @objc private func update() {
         time += 1.0
+    }
+    
+    func formattedTime() -> String {
+        String(format: "%02d:%02d", Int(time / 60), Int(time.truncatingRemainder(dividingBy: 60)))
     }
 }

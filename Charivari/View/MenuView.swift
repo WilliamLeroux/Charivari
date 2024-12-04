@@ -8,37 +8,36 @@
 import SwiftUI
 
 struct MenuView: View {
-    @StateObject private var timer = TimerManager.shared
+    private var timer = TimerManager.shared
     @State var isPlaying = false
     @State var inRanking = false
-    @State private var path: [String] = []
-    @StateObject private var fetchWord = FetchWord()
-    @StateObject private var game = GameManager(username: "abc")
+    private var game = GameManager(username: "abc")
     @State private var orderedLetters: [Letter] = []
     @State private var placedLetters: [Letter] = []
     @State private var buttonFrame: [CGRect] = []
+    @State private var name: String = ""
     let network: NetworkMonitor
+    @State private var noName: Bool = false
     
     init(network: NetworkMonitor) {
         self.network = network
-        let tempWord = Word(Word: "mi", Secret: "123", Error: "")
-        game.setWord(word: tempWord)
+        game.getPickNewWord()
         orderedLetters = game.orderedLetters
-        for _ in orderedLetters{
-            placedLetters.append(Letter(id: -1, text: " ", offset: .zero))
+        for letter in orderedLetters{
+            placedLetters.append(Letter(id: letter.id, text: " ", offset: .zero))
             buttonFrame.append(.zero)
         }
-        timer.start()
     }
     
     var body: some View {
-        NavigationStack(path: $path){
+        NavigationStack{
             ZStack{
                 backgroundVw
                     .toolbar {
                         if (!network.getNetworkState()){
                             Image(systemName: "wifi.exclamationmark")
                                 .font(.system(size: 25))
+                                .foregroundStyle(.red)
                         }
                         Button(action: {}) {
                             Image(systemName: "person.crop.circle.fill")
@@ -53,45 +52,36 @@ struct MenuView: View {
                         .fontWeight(.bold)
                     Spacer()
                         .frame(height: 40)
-                    Button(action: play) {
-                        Text("Play")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
-                            .clipShape(Rectangle())
-                            .buttonBorderShape(.circle)
-                    }
                     
-                    NavigationLink(destination: GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters, buttonFrame: buttonFrame).navigationBarBackButtonHidden(true), isActive: $isPlaying) {
+                    
+                    NavigationLink("Play") {
+                        GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters, buttonFrame: buttonFrame).navigationBarBackButtonHidden(true)
                     }
+                    .font(.title)
+                    .foregroundStyle(.white)
+                    .frame(width: 100, height: 60)
+                    .background(RoundedRectangle(cornerSize: CGSize(width: 15, height: 15))
+                                    .fill(Color.blue)
+                    )
                     
                     Spacer()
                         .frame(height: 20)
                     
-                    Button(action: ranking) {
-                        Text("Ranking")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.blue)
-                            .clipShape(Rectangle())
-                            .buttonBorderShape(.circle)
+                    NavigationLink("Ranking") {
+                        RankingView()
                     }
-                    NavigationLink(destination: RankingView().navigationBarBackButtonHidden(true), isActive: $inRanking) {
-                        EmptyView()
-                    }
+                    .font(.title)
+                    .foregroundStyle(.white)
+                    .frame(width: 175, height: 60)
+                    .background(RoundedRectangle(cornerSize: CGSize(width: 15, height: 15))
+                                    .fill(Color.blue)
+                    )
+                }
+                .navigationDestination(for: String.self) { string in
+                    GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters, buttonFrame: buttonFrame).navigationBarBackButtonHidden(true)
                 }
             }
         }
-        .environmentObject(fetchWord)
-    }
-    private func play() {
-        self.isPlaying = true
-    }
-    
-    private func ranking() {
-        self.inRanking = true
     }
     
     private func checkNetwork() {
@@ -113,5 +103,3 @@ private extension MenuView {
             .ignoresSafeArea(.all)
     }
 }
-
-

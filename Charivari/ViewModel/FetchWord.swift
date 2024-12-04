@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 actor WordActor {
     var wordTab =  [Word?](repeating: nil, count: 100)
     func setWord(_ word: Word) {
@@ -14,22 +15,19 @@ actor WordActor {
 }
 
 class FetchWord: ObservableObject {
-    @Published var word: Word?
+    var word: Word?
     
     init() {
         
     }
     
-    func getWord(difficulty: String) async -> Word?{
+    func getWord(difficulty: String) async {
         do {
             let word = try await fetchWord(difficulty: difficulty)
-            DispatchQueue.main.async {
-                self.word = word
-            }
+            self.word = word
         }catch let jsonError as NSError {
             print("JSON decode failed: \(jsonError.localizedDescription)")
         }
-        return self.word ?? nil
     }
     
     func get100Words(difficulty: String) async {
@@ -55,9 +53,27 @@ class FetchWord: ObservableObject {
             throw URLError(.badURL)
         }
         let (data, _) = try await URLSession.shared.data(from: url)
-        
+        print(try JSONDecoder().decode(Word.self, from: data))
         return try JSONDecoder().decode(Word.self, from: data)
     }
+    
+    func sendScore(game: Game) async {
+        do {
+            let postScore = try await postResult(game: game)
+        } catch let jsonError as NSError {
+            print("JSON decode failed: \(jsonError.localizedDescription)")
+        }
+    }
+    
+    private func postResult(game: Game) async throws -> PostScore {
+        let endpoint = "https://420c56.drynish.synology.me/solve/\(String(describing: game.word.unsafelyUnwrapped.Word))/\(String(describing: game.word.unsafelyUnwrapped.Secret))/\(game.username)/\(Int(game.time))"
+        guard let url = URL(string: endpoint) else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return try JSONDecoder().decode(PostScore.self, from: data)
+    }
+        
     
     func saveWords() {
         

@@ -1,11 +1,31 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-      "shouldTranslate" : false
+    " %@" : {
+
+    },
+    " %@ sec" : {
+
+    },
+    "Back" : {
+
     },
     "Charivari" : {
       "shouldTranslate" : false
+    },
+    "Congratulations!" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Félicitation!"
+          }
+        }
+      }
+    },
+    "Give up" : {
+
     },
     "Play" : {
       "extractionState" : "manual",
@@ -35,6 +55,26 @@
         }
       }
     },
+    "Replay" : {
+
+    },
+    "the_word_was" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The word was: "
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mot était: "
+          }
+        }
+      }
+    },
     "Time" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -42,6 +82,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Temps:"
+          }
+        }
+      }
+    },
+    "time_spent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time spent:"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Temps utilisé:"
           }
         }
       }
