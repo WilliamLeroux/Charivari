@@ -12,6 +12,9 @@ class GameManager : ObservableObject{
     private var fetchWord = FetchWord()
     private var game: Game
     private var hasGame = false
+    private let wordDatabase = WordDatabaseManager.shared
+    //private let scoreDatabase = ScoreDatabaseManager.shared
+    private var netword = NetworkMonitor.shared
     @Published var placedLetters = Array<Character>()
     var orderedLetters: [Letter] = []
     @Published var word: Word?
@@ -31,6 +34,10 @@ class GameManager : ObservableObject{
                 game = Game(username: username, time: 0.0, isFound: false)
         }
         //setWord(word: Word(Word: "abc", Secret: "", Error: "")) // À retirer, seulement pour la preview
+        
+        if (wordDatabase.getCount() < 100) {
+            wordDatabase.insert(word: Word(Word: "abc", Secret: "abcdefghijklmnopqrstuvwxyz", Error: ""))
+        }
     }
     
     
@@ -127,12 +134,24 @@ class GameManager : ObservableObject{
         if (tempWord == tempSecretWord) {
             timer.stop()
             game.time = timer.time
-            Task {
-                await fetchWord.sendScore(game: game)
+            if (netword.getNetworkState()) {
+                Task {
+                    await fetchWord.sendScore(game: game)
+                }
+            } else {
+                updateScoreDatabase()
             }
+            
             return true
         }
         return false
+    }
+    
+    func updateScoreDatabase() {
+        wordDatabase.insert(word: game.word!)
+        if (game.id != -1) {
+            wordDatabase.delete(id: game.id)
+        }
     }
     
     func reloadWord() {

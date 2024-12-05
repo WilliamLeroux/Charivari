@@ -6,6 +6,7 @@
 //
 
 struct Game: Encodable, Decodable{
+    var id : Int = -1
     var username: String
     var word: Word?
     var time: Double
