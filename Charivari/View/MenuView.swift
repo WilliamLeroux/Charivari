@@ -11,18 +11,20 @@ struct MenuView: View {
     private var timer = TimerManager.shared
     @State var isPlaying = false
     @State var inRanking = false
-    private var game = GameManager(username: "abc")
+    private var game = GameManager.shared
     @State private var orderedLetters: [Letter] = []
     @State private var placedLetters: [Letter] = []
     @State private var buttonFrame: [CGRect] = []
     @State private var name: String = ""
-    let network: NetworkMonitor
+    @ObservedObject var network : NetworkMonitor
     @State private var noName: Bool = false
     
     init(network: NetworkMonitor) {
         self.network = network
-        game.getPickNewWord()
+        network.delegate = game
+        game.pickNewWord()
         orderedLetters = game.orderedLetters
+        game.checkDatabase()
         for letter in orderedLetters{
             placedLetters.append(Letter(id: letter.id, text: " ", offset: .zero))
             buttonFrame.append(.zero)
@@ -34,7 +36,7 @@ struct MenuView: View {
             ZStack{
                 backgroundVw
                     .toolbar {
-                        if (!network.getNetworkState()){
+                        if (!network.connected){
                             Image(systemName: "wifi.exclamationmark")
                                 .font(.system(size: 25))
                                 .foregroundStyle(.red)

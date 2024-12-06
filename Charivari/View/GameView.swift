@@ -65,6 +65,7 @@ struct GameView: View {
         .onChange(of: scenePhase) {
             switch scenePhase {
             case .active:
+                print("coucou")
                 game.reloadWord()
                 timer.start()
                 break
@@ -82,7 +83,7 @@ struct GameView: View {
 }
 
 #Preview {
-    GameView(game: GameManager(username: "abc"), orderedLetters: ([Letter(id: 0, text: "a", offset: .zero), Letter(id: 1, text: "b", offset: .zero), Letter(id: 2, text: "c", offset: .zero)]), placedLetters: ([Letter(id: 0, text: " ", offset: .zero), Letter(id: 1, text: " ", offset: .zero), Letter(id: 2, text: " ", offset: .zero)]), buttonFrame: ([CGRect](repeating: .zero, count: 3)))
+    GameView(game: GameManager(), orderedLetters: ([Letter(id: 0, text: "a", offset: .zero), Letter(id: 1, text: "b", offset: .zero), Letter(id: 2, text: "c", offset: .zero)]), placedLetters: ([Letter(id: 0, text: " ", offset: .zero), Letter(id: 1, text: " ", offset: .zero), Letter(id: 2, text: " ", offset: .zero)]), buttonFrame: ([CGRect](repeating: .zero, count: 3)))
 }
 
 private extension GameView {
@@ -131,7 +132,7 @@ private extension GameView {
                 Button("Replay", action: {
                     placedLetters = []
                     orderedLetters.removeAll()
-                    game.getPickNewWord()
+                    game.pickNewWord()
                     //game.setWord(word: Word(Word: "abcde", Secret: "", Error: ""))
                     orderedLetters = game.orderedLetters
                     
@@ -175,6 +176,7 @@ private extension GameView {
                 GridRow {
                     ForEach($placedLetters, id: \.id) { $letter in
                         Text("\(letter.text)")
+                            .foregroundStyle(.black)
                             .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.center)
                             .padding()
@@ -209,6 +211,7 @@ private extension GameView {
                     ForEach($orderedLetters, id: \.id) { $letter in
                         if (letter.isShown) {
                             Text("\(letter.text)")
+                                .foregroundStyle(.black)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .multilineTextAlignment(.center)
                                 .padding()
@@ -263,6 +266,7 @@ private extension GameView {
                 orderedLetters[letter.id].isShown = false
                 gameFinished = game.checkWord(letterArray: placedLetters)
                 if (gameFinished) {
+                    print("coucou2")
                     timer.stop()
                 }
             }

@@ -7,15 +7,9 @@
 
 import SwiftUI
 
-actor WordActor {
-    var wordTab =  [Word?](repeating: nil, count: 100)
-    func setWord(_ word: Word) {
-        wordTab.append(word)
-    }
-}
-
 class FetchWord: ObservableObject {
     var word: Word?
+    private var network = NetworkMonitor.shared
     
     init() {
         
@@ -30,36 +24,50 @@ class FetchWord: ObservableObject {
         }
     }
     
-    func get100Words(difficulty: String) async {
-        let wordActor = WordActor()
+    func getWords(amount: Int) async -> [Word?] {
+        var wordTab: [Word?] = []
+        var requestWorked = false
         do {
-            for _ in 0..<100 {
-                let word = try await fetchWord(difficulty: difficulty)
-                Task {
-                    await wordActor.setWord(word)
+            for i in 0..<amount {
+                while (!requestWorked) {
+                    if (!network.connected) {
+                        break
+                    }
+                    let word = try await fetchWord()
+                    if (word.Word != "") {
+                        wordTab.append(word)
+                        requestWorked = true
+                    }
                 }
-            }
-            for i in 0..<100 {
-                
+                if (!network.connected) {
+                    break
+                }
+                requestWorked = false
             }
         }catch let jsonError as NSError {
             print("JSON decode failed: \(jsonError.localizedDescription)")
         }
+        return wordTab
     }
     
-    private func fetchWord(difficulty: String) async throws -> Word {
-        let endpoint = "https://420c56.drynish.synology.me/new/\(difficulty)"
+    private func fetchWord(difficulty: String = "") async throws -> Word {
+        var endpoint: String = ""
+        if (difficulty == "") {
+            endpoint = "https://420c56.drynish.synology.me/new"
+        } else {
+            endpoint = "https://420c56.drynish.synology.me/new/\(difficulty)"
+        }
         guard let url = URL(string: endpoint) else {
             throw URLError(.badURL)
         }
         let (data, _) = try await URLSession.shared.data(from: url)
-        print(try JSONDecoder().decode(Word.self, from: data))
+    
         return try JSONDecoder().decode(Word.self, from: data)
     }
     
     func sendScore(game: Game) async {
         do {
-            let postScore = try await postResult(game: game)
+            _ = try await postResult(game: game)
         } catch let jsonError as NSError {
             print("JSON decode failed: \(jsonError.localizedDescription)")
         }
@@ -75,7 +83,23 @@ class FetchWord: ObservableObject {
     }
         
     
-    func saveWords() {
+    func getScore(word: String) async -> Score? {
+        var score: Score? = nil
+        do {
+            score = try await fetchScore(word: word)
+        } catch let jsonError as NSError {
+            print("JSON decode failed: \(jsonError.localizedDescription)")
+        }
         
+        return score
+    }
+    
+    private func fetchScore(word: String) async throws -> Score {
+        let endpoint = "https://420c56.drynish.synology.me/score/\(word)"
+        guard let url = URL(string: endpoint) else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return try JSONDecoder().decode(Score.self, from: data)
     }
 }

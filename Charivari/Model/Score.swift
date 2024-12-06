@@ -9,3 +9,13 @@ struct PostScore: Encodable, Decodable {
     var Success: Bool
     var Error: String
 }
+
+struct Score: Encodable, Decodable {
+    var List: [ScoreList]?
+    var Error: String
+}
+
+struct ScoreList: Encodable, Decodable {
+    var Player: String
+    var Score: Int
+}

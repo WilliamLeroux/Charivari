@@ -4,25 +4,54 @@
 //
 //  Created by William Leroux on 2024-11-28.
 //
+
+import SwiftUI
 import Network
-class NetworkMonitor {
+class NetworkMonitor : ObservableObject{
     
     static let shared = NetworkMonitor()
     
     private let monitor = NWPathMonitor()
-    private var connected = true
+    @Published var connected = false
+    weak var delegate: NetworkDelegate?
     
     init() {
+        performInitialCheck()
+        let queue = DispatchQueue.main
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
+                if !self.connected {
+                    self.delegate?.hasConnection()
+                }
                 self.connected = true
             } else {
                 self.connected = false
             }
         }
-        
-        let queue = DispatchQueue(label: "Monitor")
+    
+        if (monitor.currentPath.status == .satisfied) {
+            self.connected = true
+        }
         monitor.start(queue: queue)
+    }
+    
+    func performInitialCheck() {
+        let monitor = NWPathMonitor()
+        let semaphore = DispatchSemaphore(value: 0)
+        var initialConnected = false
+        let queue = DispatchQueue.global(qos: .background)
+        
+        monitor.pathUpdateHandler = { path in
+            initialConnected = (path.status == .satisfied)
+            semaphore.signal()
+        }
+        
+        monitor.start(queue: queue)
+         
+         semaphore.wait()
+         monitor.cancel()
+        
+         self.connected = initialConnected
     }
     
     /// Retrieves the current network state.

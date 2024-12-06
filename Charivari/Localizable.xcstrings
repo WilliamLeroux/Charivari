@@ -1,14 +1,30 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    " %@" : {
+    "" : {
 
+    },
+    " %@" : {
+      "shouldTranslate" : false
     },
     " %@ sec" : {
-
+      "shouldTranslate" : false
+    },
+    "%@" : {
+      "shouldTranslate" : false
+    },
+    "%lld" : {
+      "shouldTranslate" : false
     },
     "Back" : {
-
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retour"
+          }
+        }
+      }
     },
     "Charivari" : {
       "shouldTranslate" : false
@@ -25,7 +41,30 @@
       }
     },
     "Give up" : {
-
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandonner"
+          }
+        }
+      }
+    },
+    "La recherche de score est vide" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search is empty"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La recherche est vide"
+          }
+        }
+      }
     },
     "Play" : {
       "extractionState" : "manual",
@@ -56,7 +95,30 @@
       }
     },
     "Replay" : {
-
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rejouer"
+          }
+        }
+      }
+    },
+    "Search" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search a word"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher un mot"
+          }
+        }
+      }
     },
     "the_word_was" : {
       "extractionState" : "manual",
@@ -97,7 +159,7 @@
         },
         "fr-CA" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Temps utilisé:"
           }
         }

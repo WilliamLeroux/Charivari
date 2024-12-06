@@ -27,7 +27,7 @@ class TimerManager: ObservableObject {
     }
     
     func setTime(time: Double)  {
-        self.time += time
+        self.time = time
     }
     
     @objc private func update() {

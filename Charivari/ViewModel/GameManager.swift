@@ -7,40 +7,55 @@
 
 import SwiftUI
 
-class GameManager : ObservableObject{
+class GameManager : ObservableObject, NetworkDelegate{
+    static var shared = GameManager()
     private var timer = TimerManager.shared
     private var fetchWord = FetchWord()
     private var game: Game
     private var hasGame = false
     private let wordDatabase = WordDatabaseManager.shared
-    //private let scoreDatabase = ScoreDatabaseManager.shared
-    private var netword = NetworkMonitor.shared
+    private var network = NetworkMonitor.shared
     @Published var placedLetters = Array<Character>()
-    var orderedLetters: [Letter] = []
     @Published var word: Word?
+    var orderedLetters: [Letter] = []
     
-    init(username: String) {
-        let userGame = UserDefaults.standard.object(forKey: "game") as? Game
-        if (userGame != nil) {
-            if (userGame!.isFound) {
-                game = Game(username: username, time: 0.0, isFound: false)
-                UserDefaults.standard.set(game, forKey: "game")
-            } else {
-                hasGame = true
-                game = userGame!
-                timer.setTime(time: game.time)
+    
+    init() {
+        game = Game(username: "Anonyme", time: 0.0, isFound: false)
+    }
+    
+    func checkDatabase() {
+        if (network.connected){
+            if (wordDatabase.getCount() < 100) {
+                print(wordDatabase.getCount())
+                DispatchQueue.global().async {
+                    self.pickManyWords()
+                }
             }
-        } else {
-                game = Game(username: username, time: 0.0, isFound: false)
-        }
-        //setWord(word: Word(Word: "abc", Secret: "", Error: "")) // À retirer, seulement pour la preview
-        
-        if (wordDatabase.getCount() < 100) {
-            wordDatabase.insert(word: Word(Word: "abc", Secret: "abcdefghijklmnopqrstuvwxyz", Error: ""))
         }
     }
     
+    func setName(name: String) {
+        game.username = name
+    }
     
+    func hasConnection() {
+        print("has connection")
+        let scores = wordDatabase.getAllScore()
+        if (!scores.isEmpty) {
+            DispatchQueue.global().async {
+                let waiter = DispatchSemaphore(value: 0)
+                for score in scores {
+                    Task{
+                        await self.fetchWord.sendScore(game: score)
+                        waiter.signal()
+                    }
+                    waiter.wait()
+                    self.wordDatabase.deleteScore(id: score.id)
+                }
+            }
+        }
+    }
     
     func setWord(word: Word) {
         self.game.word = word
@@ -103,16 +118,34 @@ class GameManager : ObservableObject{
         return game.word?.Word.count ?? 0
     }
     
-    func getPickNewWord() {
-        let waiter = DispatchSemaphore(value: 0)
-        Task {
-            await fetchWord.getWord(difficulty: "1")
-            game.word = fetchWord.word
+    func pickNewWord() {
+        if (network.connected) {
+            game.id = -1
+            let waiter = DispatchSemaphore(value: 0)
+            var wordIsOk: Bool = false
+            Task {
+                while(!wordIsOk){
+                    await fetchWord.getWord(difficulty: "1")
+                    
+                    if (fetchWord.word?.Word != nil) {
+                        if (fetchWord.word!.Word != "") {
+                            game.word = fetchWord.word
+                            wordIsOk = true
+                        }
+                    }
+                }
+                print(game.word?.Word)
+                waiter.signal()
+            }
+            
+            waiter.wait()
+        } else {
+            let lowestId = wordDatabase.getLowestId()
+            let requestResponse = wordDatabase.getWord(id: lowestId)
+            game.id = lowestId
+            game.word = requestResponse.word
             print(game.word?.Word)
-            waiter.signal()
         }
-        
-        waiter.wait()
         orderedLetters.removeAll()
         updateOrderedLetters()
         placedLetters.removeAll()
@@ -120,12 +153,35 @@ class GameManager : ObservableObject{
         saveWord()
     }
     
+    func pickManyWords() {
+        
+            let count = wordDatabase.getCount()
+            let waiter = DispatchSemaphore(value: 0)
+            var newWordsTable: [Word?] = []
+            Task {
+                await newWordsTable = fetchWord.getWords(amount: 100 - count)
+                waiter.signal()
+            }
+            waiter.wait()
+            
+            for word in newWordsTable {
+                if (word != nil) {
+                    wordDatabase.insertWord(word: word!)
+                }
+            }
+    }
+    
     func getWord() -> String {
         return game.word?.Word ?? "nil"
     }
     
     func checkWord(letterArray: [Letter]) -> Bool{
-        reloadWord()
+        if (game.word != nil) {
+            if (getWordFromUserDefaults() != game.word!.Word) {
+                reloadWord()
+            }
+        }
+        
         var tempWord : String = ""
         let tempSecretWord = game.word!.Word.uppercased()
         for letter in letterArray {
@@ -134,12 +190,12 @@ class GameManager : ObservableObject{
         if (tempWord == tempSecretWord) {
             timer.stop()
             game.time = timer.time
-            if (netword.getNetworkState()) {
+            if (network.connected) {
                 Task {
                     await fetchWord.sendScore(game: game)
                 }
             } else {
-                updateScoreDatabase()
+                updateScore()
             }
             
             return true
@@ -147,10 +203,10 @@ class GameManager : ObservableObject{
         return false
     }
     
-    func updateScoreDatabase() {
-        wordDatabase.insert(word: game.word!)
+    func updateScore() {
+        wordDatabase.insertScore(game: game)
         if (game.id != -1) {
-            wordDatabase.delete(id: game.id)
+            wordDatabase.deleteWord(id: game.id)
         }
     }
     
@@ -162,6 +218,16 @@ class GameManager : ObservableObject{
                 timer.setTime(time: game.time)
             }
         }
+    }
+    
+    func getWordFromUserDefaults() -> String {
+        if (UserDefaults.standard.object(forKey: "game") != nil) {
+            if let gameEncode = UserDefaults.standard.data(forKey: "game"),
+               let gameDecode = try? JSONDecoder().decode(Game.self, from: gameEncode) {
+                return gameDecode.word!.Word
+            }
+        }
+        return ""
     }
     
     func saveWord() {
