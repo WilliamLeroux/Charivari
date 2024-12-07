@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct MenuView: View {
+    @ObservedObject var bgManager = BackgroundManager.shared
     private var timer = TimerManager.shared
     @State var isPlaying = false
     @State var inRanking = false
@@ -17,7 +19,7 @@ struct MenuView: View {
     @State private var buttonFrame: [CGRect] = []
     @State private var name: String = ""
     @ObservedObject var network : NetworkMonitor
-    @State private var noName: Bool = false
+    @State private var noName: Bool = true
     
     init(network: NetworkMonitor) {
         self.network = network
@@ -41,13 +43,18 @@ struct MenuView: View {
                                 .font(.system(size: 25))
                                 .foregroundStyle(.red)
                         }
-                        Button(action: {}) {
-                            Image(systemName: "person.crop.circle.fill")
-                                .frame(width: 50, height: 50)
-                                .font(.system(size: 25))
-                                .foregroundStyle(.black)
+                        NavigationLink("Profil") {
+                            ProfilePreferenceView().navigationBarBackButtonHidden(true)
                         }
+                        .font(.system(size: 15))
+                        .padding(.leading, -5.807)
+                        .foregroundStyle(.white)
+                        .frame(width: 55, height: 30)
+                        .background(RoundedRectangle(cornerSize: CGSize(width: 15, height: 15))
+                            .fill(Color.blue)
+                        )
                     }
+                
                 VStack{
                     Text("Charivari")
                         .font(.title)
@@ -70,7 +77,7 @@ struct MenuView: View {
                         .frame(height: 20)
                     
                     NavigationLink("Ranking") {
-                        RankingView()
+                        RankingView().navigationBarBackButtonHidden(true)
                     }
                     .font(.title)
                     .foregroundStyle(.white)
@@ -79,16 +86,28 @@ struct MenuView: View {
                                     .fill(Color.blue)
                     )
                 }
+                .alert("Enter a name", isPresented: $noName) {
+                    TextField("Name", text: $name)
+                        .autocorrectionDisabled()
+                    
+                    Button("OK", action: {
+                        submit()
+                    })
+                }
                 .navigationDestination(for: String.self) { string in
                     GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters, buttonFrame: buttonFrame).navigationBarBackButtonHidden(true)
                 }
+            }.onAppear{
+                self.$noName.wrappedValue = !game.hasName()
             }
         }
     }
-    
-    private func checkNetwork() {
-        if (!network.getNetworkState()) {
-            
+    func submit() {
+        if (name.isEmpty) {
+            noName.toggle()
+        } else {
+            game.setName(name: name)
+            noName = false
         }
     }
 }
@@ -99,7 +118,7 @@ struct MenuView: View {
 
 private extension MenuView {
     var backgroundVw: some View {
-        Image(.background4)
+        Image(bgManager.getBackgroundImage(id: self.bgManager.backgroundId))
             .resizable()
             .scaledToFill()
             .ignoresSafeArea(.all)

@@ -2,7 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "" : {
-
+      "shouldTranslate" : false
     },
     " %@" : {
       "shouldTranslate" : false
@@ -26,6 +26,36 @@
         }
       }
     },
+    "Background" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fond"
+          }
+        }
+      }
+    },
+    "Background:" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fond:"
+          }
+        }
+      }
+    },
+    "Change" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer"
+          }
+        }
+      }
+    },
     "Charivari" : {
       "shouldTranslate" : false
     },
@@ -40,12 +70,62 @@
         }
       }
     },
+    "Difficulty" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difficulté"
+          }
+        }
+      }
+    },
+    "Difficulty:" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difficulté:"
+          }
+        }
+      }
+    },
+    "Easy" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Facile"
+          }
+        }
+      }
+    },
+    "Enter a name" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrez votre nom"
+          }
+        }
+      }
+    },
     "Give up" : {
       "localizations" : {
         "fr-CA" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Abandonner"
+          }
+        }
+      }
+    },
+    "hard" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difficile"
           }
         }
       }
@@ -66,6 +146,46 @@
         }
       }
     },
+    "Medium" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intermédiaire"
+          }
+        }
+      }
+    },
+    "Name" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom"
+          }
+        }
+      }
+    },
+    "Ok" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ok"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
     "Play" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -79,6 +199,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jouer"
+          }
+        }
+      }
+    },
+    "Profil" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        }
+      }
+    },
+    "Random" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aléatoire"
           }
         }
       }
@@ -116,6 +256,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rechercher un mot"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages"
           }
         }
       }
@@ -161,6 +311,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Temps utilisé:"
+          }
+        }
+      }
+    },
+    "Word was: %@" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mot était: %@"
+          }
+        }
+      }
+    },
+    "Your name:" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre nom:"
           }
         }
       }

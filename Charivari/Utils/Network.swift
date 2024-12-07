@@ -48,7 +48,7 @@ class NetworkMonitor : ObservableObject{
         
         monitor.start(queue: queue)
          
-         semaphore.wait()
+        _ = semaphore.wait(timeout: .now() + 0.05)
          monitor.cancel()
         
          self.connected = initialConnected

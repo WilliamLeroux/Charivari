@@ -18,10 +18,17 @@ class GameManager : ObservableObject, NetworkDelegate{
     @Published var placedLetters = Array<Character>()
     @Published var word: Word?
     var orderedLetters: [Letter] = []
+    var difficulty = "0"
     
     
     init() {
-        game = Game(username: "Anonyme", time: 0.0, isFound: false)
+        game = Game(username: "", time: 0.0, isFound: false)
+        if let username = UserDefaults.standard.string(forKey: "username") {
+            game.username = username
+        }
+        if let difficulty = UserDefaults.standard.string(forKey: "difficulty") {
+            self.difficulty = difficulty
+        }
     }
     
     func checkDatabase() {
@@ -35,8 +42,22 @@ class GameManager : ObservableObject, NetworkDelegate{
         }
     }
     
+    func setDifficulty(difficulty: String) {
+        self.difficulty = difficulty
+        UserDefaults.standard.set(difficulty, forKey: "difficulty")
+    }
+    
     func setName(name: String) {
         game.username = name
+        UserDefaults.standard.set(name, forKey: "username")
+    }
+    
+    func getName() -> String {
+        return game.username
+    }
+    
+    func hasName() -> Bool {
+        return !game.username.isEmpty
     }
     
     func hasConnection() {
@@ -125,7 +146,7 @@ class GameManager : ObservableObject, NetworkDelegate{
             var wordIsOk: Bool = false
             Task {
                 while(!wordIsOk){
-                    await fetchWord.getWord(difficulty: "1")
+                    await fetchWord.getWord(difficulty: self.difficulty)
                     
                     if (fetchWord.word?.Word != nil) {
                         if (fetchWord.word!.Word != "") {

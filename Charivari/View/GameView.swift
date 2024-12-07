@@ -4,16 +4,19 @@
 //
 //  Created by William Leroux on 2024-11-26.
 //
+
 import SwiftUI
 
 struct GameView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject var bgManager = BackgroundManager.shared
     var game: GameManager
     @State var orderedLetters: [Letter]
     @ObservedObject var timer = TimerManager.shared
     @State var placedLetters: [Letter]
     @State var buttonFrame: [CGRect]
     @State var gameFinished: Bool = false
+    @State var showWord: Bool = false
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
@@ -38,14 +41,25 @@ struct GameView: View {
                 }
                 
                 Button("Give up", action: {
-                    dismiss()
+                    self.$showWord.wrappedValue = true
+                    timer.stop()
+                    
                 })
                 .fontWeight(.bold)
                 .foregroundStyle(.white)
-                .frame(width: 75, height: 50)
+                .frame(width: 130, height: 50)
                 .background(RoundedRectangle(cornerSize: CGSize(width: 15, height: 15))
-                    .fill(Color.blue)
-                )
+                    .fill(Color.blue))
+                .alert("Give up", isPresented: $showWord) {
+                    Button("Ok", role: .cancel) {
+                        self.$showWord.wrappedValue = false
+                        game.pickNewWord()
+                        timer.reset()
+                        dismiss()
+                    }
+                } message: {
+                    Text("Word was: \(game.getWord())")
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             if (gameFinished) {
@@ -65,7 +79,6 @@ struct GameView: View {
         .onChange(of: scenePhase) {
             switch scenePhase {
             case .active:
-                print("coucou")
                 game.reloadWord()
                 timer.start()
                 break
@@ -88,7 +101,7 @@ struct GameView: View {
 
 private extension GameView {
     var backgroundVw: some View {
-        Image(.background4)
+        Image(bgManager.getBackgroundImage(id: self.bgManager.backgroundId))
             .resizable()
             .scaledToFill()
             .ignoresSafeArea(.all)
@@ -133,7 +146,6 @@ private extension GameView {
                     placedLetters = []
                     orderedLetters.removeAll()
                     game.pickNewWord()
-                    //game.setWord(word: Word(Word: "abcde", Secret: "", Error: ""))
                     orderedLetters = game.orderedLetters
                     
                     var tempArray: [Letter] = []
@@ -160,6 +172,7 @@ private extension GameView {
                     )
             }
         }
+        .foregroundStyle(.black)
         .frame(width: 350, height: 300)
         .background(RoundedRectangle(cornerSize: CGSize(width: 50, height: 50))
                         .fill(Color.white)
@@ -255,19 +268,20 @@ private extension GameView {
         if let match = buttonFrame.firstIndex(where: {
             $0.contains(location) }) {
             if (dropped) {
-                if (placedLetters[match].text != " ") {
-                    for i in 0..<orderedLetters.count {
-                        if (orderedLetters[i].text == placedLetters[match].text && !orderedLetters[i].isShown) {
-                            orderedLetters[i].isShown = true
+                if (placedLetters.count >= match) {
+                    if (placedLetters[match].text != " ") {
+                        for i in 0..<orderedLetters.count {
+                            if (orderedLetters[i].text == placedLetters[match].text && !orderedLetters[i].isShown) {
+                                orderedLetters[i].isShown = true
+                            }
                         }
                     }
-                }
-                placedLetters[match].text = letter.text
-                orderedLetters[letter.id].isShown = false
-                gameFinished = game.checkWord(letterArray: placedLetters)
-                if (gameFinished) {
-                    print("coucou2")
-                    timer.stop()
+                    placedLetters[match].text = letter.text
+                    orderedLetters[letter.id].isShown = false
+                    gameFinished = game.checkWord(letterArray: placedLetters)
+                    if (gameFinished) {
+                        timer.stop()
+                    }
                 }
             }
             return .good

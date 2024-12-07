@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RankingView: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var searchText: String = ""
     @StateObject private var scoreManager = ScoreManager()
     
@@ -85,20 +86,25 @@ struct RankingView: View {
                 }
             }
         }
+        .toolbar {
+            
+            Button("Back") {
+                dismiss()
+            }
+            .fontWeight(.bold)
+            .frame(width: 100, height: 44)
+            .background(Color.green.secondary)
+            .cornerRadius(16)
+            .foregroundStyle(.white)
+        }
     }
     func scoreRow(score: ScoreList, word: String) -> some View {
         HStack{
             Text(word)
             Text("\(score.Player)")
-                //.font(.headline)
-                //.fontWeight(.bold)
-                .foregroundStyle(.black)
                 .fixedSize()
             Spacer()
             Text("\(score.Score)")
-                //.font(.headline)
-                //.fontWeight(.bold)
-                .foregroundStyle(.black)
                 .fixedSize()
         }
     }

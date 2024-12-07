@@ -28,7 +28,7 @@ class FetchWord: ObservableObject {
         var wordTab: [Word?] = []
         var requestWorked = false
         do {
-            for i in 0..<amount {
+            for _ in 0..<amount {
                 while (!requestWorked) {
                     if (!network.connected) {
                         break
@@ -52,7 +52,7 @@ class FetchWord: ObservableObject {
     
     private func fetchWord(difficulty: String = "") async throws -> Word {
         var endpoint: String = ""
-        if (difficulty == "") {
+        if (difficulty == "" || difficulty == "0") {
             endpoint = "https://420c56.drynish.synology.me/new"
         } else {
             endpoint = "https://420c56.drynish.synology.me/new/\(difficulty)"
