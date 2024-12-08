@@ -119,8 +119,13 @@ struct GameView: View {
         .onChange(of: scenePhase) {
             switch scenePhase {
             case .active:
-                game.reloadWord()
-                timer.start()
+                if (game.hasWord()) {
+                    game.reloadWord()
+                    
+                }else {
+                    game.pickNewWord()
+                    timer.start()
+                }
                 break
             case .background:
                 break
@@ -170,6 +175,8 @@ private extension GameView {
             
             HStack {
                 Button("Back", action: {
+                    timer.reset()
+                    game.pickNewWord()
                     dismiss()
                 })
                 .fontWeight(.bold)

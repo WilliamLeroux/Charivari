@@ -131,10 +131,24 @@
       }
     },
     "Hint" : {
-
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indice"
+          }
+        }
+      }
     },
     "Hint: %lld/3" : {
-
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indices: %lld/3"
+          }
+        }
+      }
     },
     "La recherche de score est vide" : {
       "localizations" : {
@@ -173,7 +187,14 @@
       }
     },
     "No more hints left" : {
-
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous n’avez plus d’indice disponible"
+          }
+        }
+      }
     },
     "Ok" : {
       "localizations" : {

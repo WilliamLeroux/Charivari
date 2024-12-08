@@ -132,7 +132,6 @@ class GameManager : ObservableObject, NetworkDelegate{
                         }
                     }
                 }
-                print(game.word?.Word)
                 waiter.signal()
             }
             waiter.wait()
@@ -141,7 +140,6 @@ class GameManager : ObservableObject, NetworkDelegate{
             let requestResponse = wordDatabase.getWord(id: lowestId)
             game.id = lowestId
             game.word = requestResponse.word
-            print(game.word?.Word)
         }
         orderedLetters.removeAll()
         updateOrderedLetters()
@@ -311,11 +309,5 @@ class GameManager : ObservableObject, NetworkDelegate{
             return !game.isFound
         }
         return false
-    }
-    
-    /// Abandon
-    func giveUp() {
-        game.isFound = true
-        saveWord()
     }
 }
