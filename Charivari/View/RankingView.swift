@@ -7,10 +7,11 @@
 
 import SwiftUI
 
+/// Structure représentant la vue du classement
 struct RankingView: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var searchText: String = ""
-    @StateObject private var scoreManager = ScoreManager()
+    @Environment(\.dismiss) private var dismiss /// Variable d'environnement pour retourner a la vue précédente
+    @State private var searchText: String = "" /// Recherche
+    @StateObject private var scoreManager = ScoreManager() /// Gestionnaire du score
     
     var body: some View {
         ZStack{
@@ -87,7 +88,6 @@ struct RankingView: View {
             }
         }
         .toolbar {
-            
             Button("Back") {
                 dismiss()
             }
@@ -98,7 +98,13 @@ struct RankingView: View {
             .foregroundStyle(.white)
         }
     }
-    func scoreRow(score: ScoreList, word: String) -> some View {
+    
+    /// Affiche une ligne de score
+    /// - Parameters:
+    ///   - score: Score
+    ///   - word: Mot
+    /// - Returns: View
+    private func scoreRow(score: ScoreList, word: String) -> some View {
         HStack{
             Text(word)
             Text("\(score.Player)")
@@ -109,7 +115,8 @@ struct RankingView: View {
         }
     }
     
-    func search() {
+    /// Recherche le mot
+    private func search() {
         scoreManager.getScore(word: searchText)
     }
 }
@@ -119,7 +126,7 @@ struct RankingView: View {
 }
 
 private extension RankingView {
-    var backgroundVw: some View {
+    var backgroundVw: some View { /// Background
         Image(.rankingBackground)
             .resizable()
             .scaledToFill()

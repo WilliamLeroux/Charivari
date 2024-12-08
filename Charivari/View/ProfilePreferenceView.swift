@@ -7,16 +7,17 @@
 
 import SwiftUI
 
+/// Structure représentant la vue des réglages
 struct ProfilePreferenceView: View {
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject var bgManager = BackgroundManager.shared
-    @State private var name: String = ""
-    @State private var nameChange: Bool = false
-    @State private var newBackground: String = "Background 1"
-    @State private var newDifficulty: String = "\(String(localized: "Easy"))"
-    private let game = GameManager.shared
-    private let backgrounds: [String] = ["Background 1", "Background 2", "Background 3", "Background 4", "Background 5"]
-    private let difficulties: [String] = ["\(String(localized: "Random"))", "\(String(localized: "Easy"))", "\(String(localized: "Medium"))", "\(String(localized: "hard"))"]
+    @Environment(\.dismiss) private var dismiss /// Variable d'environnement pour retourner à la vue précédente
+    @ObservedObject var bgManager = BackgroundManager.shared /// Gestionnaire du background
+    @State private var name: String = "" /// Nom du joueur
+    @State private var nameChange: Bool = false /// booléen indiquant si le nom est changé
+    @State private var newBackground: String = "Background 1" /// Nouveau background
+    @State private var newDifficulty: String = "\(String(localized: "Easy"))" /// Nouvelle difficulté
+    private let game = GameManager.shared /// Gestionnaire de jeu
+    private let backgrounds: [String] = ["Background 1", "Background 2", "Background 3", "Background 4", "Background 5"] /// Tableau contenant les background
+    private let difficulties: [String] = ["\(String(localized: "Random"))", "\(String(localized: "Easy"))", "\(String(localized: "Medium"))", "\(String(localized: "Hard"))"] /// Tableau contenant les difficultés
     
     public var body: some View {
         ZStack {
@@ -129,10 +130,21 @@ struct ProfilePreferenceView: View {
                 break
             }
             self.$name.wrappedValue = game.getName()
+            
+            switch(game.difficulty) {
+            case "1": newDifficulty = "\(String(localized: "Easy"))"
+                break
+            case "2": newDifficulty = "\(String(localized: "Medium"))"
+                break
+            case "3": newDifficulty = "\(String(localized: "Hard"))"
+                break
+            default: newDifficulty = "\(String(localized: "Random"))"
+            }
         }
     }
     
-    func submit() {
+    /// Met à jour le nom du joueur
+    private func submit() {
         if (name.isEmpty) {
             nameChange.toggle()
         } else {
@@ -141,19 +153,23 @@ struct ProfilePreferenceView: View {
         }
     }
     
-    func changeBackground(id: Int) {
+    /// Met à jour le background
+    /// - Parameter id: <#id description#>
+    private func changeBackground(id: Int) {
         bgManager.setBackgroundId(id: id)
     }
     
-    func updateDifficulty(difficulty: String) {
+    /// Met à jour la difficulté choisi par le joueur
+    /// - Parameter difficulty: Difficulté
+    private func updateDifficulty(difficulty: String) {
         switch difficulty {
-        case "Easy": game.difficulty = "1"
+        case "\(String(localized: "Easy"))": game.setDifficulty(difficulty: "1")
             break
-        case "Medium": game.difficulty = "2"
+        case "\(String(localized: "Medium"))": game.setDifficulty(difficulty: "2")
             break
-        case "Hard": game.difficulty = "3"
+        case "\(String(localized: "Hard"))": game.setDifficulty(difficulty: "3")
             break
-        default: game.difficulty = "0"
+        default: game.setDifficulty(difficulty: "0")
             break
         }
     }
@@ -164,7 +180,7 @@ struct ProfilePreferenceView: View {
 }
 
 private extension ProfilePreferenceView {
-    var backgroundVw: some View {
+    var backgroundVw: some View { /// Background
         Image(bgManager.getBackgroundImage(id: self.bgManager.backgroundId))
             .resizable()
             .scaledToFill()

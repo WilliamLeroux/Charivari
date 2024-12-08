@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+
+/// Structure représentant une lettre
 struct Letter {
-    var id: Int
-    var text: Character
-    var isShown: Bool = true
-    var dragState: DragState = .unknown
-    var offset: CGSize
-    var lastOffset: CGRect = .zero
+    var id: Int /// Id de la lettre
+    var text: Character /// Charactère
+    var isShown: Bool = true /// Booléan indiquant si la lettre est affichée ou pas
+    var dragState: DragState = .unknown /// État du drag
+    var offset: CGSize /// Offset de la lettre
 }

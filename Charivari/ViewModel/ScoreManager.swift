@@ -7,11 +7,14 @@
 
 import SwiftUI
 
+/// Gestionnaire du score
 class ScoreManager : ObservableObject{
-    private var fetchWord = FetchWord()
-    @Published var score: Score? = nil
-    var word = ""
+    private var fetchWord = FetchWord() /// Gestionnaire du serveur
+    @Published var score: Score? = nil /// Score
+    var word = "" /// Mot
     
+    /// Trouve le score selon le mot
+    /// - Parameter word: Mot rechercher
     @MainActor func getScore(word: String) {
         self.word = word
         Task {

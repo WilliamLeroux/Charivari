@@ -7,17 +7,20 @@
 
 import SwiftUI
 
+
+/// Structure représentant la vue du jeu
 struct GameView: View {
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject var bgManager = BackgroundManager.shared
-    var game: GameManager
-    @State var orderedLetters: [Letter]
-    @ObservedObject var timer = TimerManager.shared
-    @State var placedLetters: [Letter]
-    @State var buttonFrame: [CGRect]
-    @State var gameFinished: Bool = false
-    @State var showWord: Bool = false
-    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dismiss) private var dismiss /// Variable d'environnement pour retourner à la vue précédente
+    @Environment(\.scenePhase) private var scenePhase /// Variable d'environnement indiquant l'état de la vue
+    @ObservedObject private var bgManager = BackgroundManager.shared /// Gestionnaire du background
+    @ObservedObject private var timer = TimerManager.shared /// Timer
+    @State private var orderedLetters: [Letter] = [] /// Tableau contenant toute les lettres en ordre
+    @State private var placedLetters: [Letter] = [] /// Tableau contenant toute les lettres placées
+    @State private var buttonFrame: [CGRect] = [] /// Tableau contenant toute les positions des cases à remplir
+    @State private var gameFinished: Bool = false /// Booléen indiquant si la partie est terminée
+    @State private var showWord: Bool = false /// Booléen indiquant s'il faut afficher le mot
+    @State private var noHintLeft: Bool = false /// Booléen indiquant si le joueur peut encore avoir des indices
+    private var game = GameManager.shared /// gestionnaire du jeu
     
     var body: some View {
         ZStack{
@@ -39,26 +42,58 @@ struct GameView: View {
                 if (buttonFrame.count > 0){
                     letterBoxes
                 }
-                
-                Button("Give up", action: {
-                    self.$showWord.wrappedValue = true
-                    timer.stop()
-                    
-                })
-                .fontWeight(.bold)
-                .foregroundStyle(.white)
-                .frame(width: 130, height: 50)
-                .background(RoundedRectangle(cornerSize: CGSize(width: 15, height: 15))
-                    .fill(Color.blue))
-                .alert("Give up", isPresented: $showWord) {
-                    Button("Ok", role: .cancel) {
-                        self.$showWord.wrappedValue = false
-                        game.pickNewWord()
-                        timer.reset()
-                        dismiss()
+                HStack{
+                    Button("Give up", action: {
+                        self.$showWord.wrappedValue = true
+                        timer.stop()
+                        
+                    })
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .frame(width: 130, height: 50)
+                    .background(RoundedRectangle(cornerSize: CGSize(width: 15, height: 15))
+                        .fill(Color.red))
+                    .alert("Give up", isPresented: $showWord) {
+                        Button("Ok", role: .cancel) {
+                            self.$showWord.wrappedValue = false
+                            timer.stop()
+                            timer.reset()
+                            game.pickNewWord()
+                            dismiss()
+                        }
+                    } message: {
+                        Text("Word was: \(game.getWord())")
                     }
-                } message: {
-                    Text("Word was: \(game.getWord())")
+                    HStack{
+                        Button("Hint", action: {
+                            if (game.hintAmount != 3) {
+                                let hint = game.hint(gameOrderedLetters: orderedLetters, gamePlacedLetters: placedLetters)
+                                orderedLetters = hint.0
+                                placedLetters = hint.1
+                                gameFinished = hint.2
+                            } else {
+                                $noHintLeft.wrappedValue = true
+                            }
+                            
+                        })
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+                        .frame(width: 50, height: 50)
+                        .background(.blue)
+                        .cornerRadius(15)
+                        .alert("Hint", isPresented: $noHintLeft) {
+                            Button("Ok", role: .cancel) {
+                                
+                            }
+                        } message: {
+                            Text("No more hints left")
+                        }
+                        
+                        Text("Hint: \(game.hintAmount)/3")
+                        .fontWeight(.bold)
+                        .foregroundStyle(.black)
+                    }
+                    
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -67,6 +102,11 @@ struct GameView: View {
             }
         }
         .onAppear {
+            if (game.hasWord()) {
+                game.pickNewWord()
+            } else {
+                game.reloadWord()
+            }
             orderedLetters = game.orderedLetters
             placedLetters.removeAll()
             buttonFrame.removeAll()
@@ -96,20 +136,17 @@ struct GameView: View {
 }
 
 #Preview {
-    GameView(game: GameManager(), orderedLetters: ([Letter(id: 0, text: "a", offset: .zero), Letter(id: 1, text: "b", offset: .zero), Letter(id: 2, text: "c", offset: .zero)]), placedLetters: ([Letter(id: 0, text: " ", offset: .zero), Letter(id: 1, text: " ", offset: .zero), Letter(id: 2, text: " ", offset: .zero)]), buttonFrame: ([CGRect](repeating: .zero, count: 3)))
+    GameView()
 }
 
 private extension GameView {
-    var backgroundVw: some View {
+    var backgroundVw: some View { /// Background
         Image(bgManager.getBackgroundImage(id: self.bgManager.backgroundId))
             .resizable()
             .scaledToFill()
             .ignoresSafeArea(.all)
     }
-}
-
-private extension GameView {
-    var endGameComponnent: some View {
+    var endGameComponnent: some View { /// Éléments de fin de partie
         VStack{
             Text("Congratulations!")
                 .font(.largeTitle)
@@ -180,20 +217,19 @@ private extension GameView {
                         .frame(width: 350, height: 300)
         )
     }
-}
-
-private extension GameView {
-    var letterBoxes: some View {
+    var letterBoxes: some View { /// Cases des lettres placées et à placer
         VStack {
-            Grid {
+            // Lettres placées ou vide
+            Grid(alignment: .center, horizontalSpacing: placedLetters.count >= 10 ? 0.5 : 10) {
                 GridRow {
                     ForEach($placedLetters, id: \.id) { $letter in
                         Text("\(letter.text)")
+                            .font(Font.system(size: placedLetters.count >= 10 ? 12 : 20))
                             .foregroundStyle(.black)
                             .fixedSize(horizontal: false, vertical: true)
                             .multilineTextAlignment(.center)
                             .padding()
-                            .frame(width: 50, height: 50)
+                            .frame(width: placedLetters.count >= 10 ? 40 : 50, height: placedLetters.count >= 10 ? 40 : 50)
                             .background(letterRec(letter: $letter, fix: true))
                             .overlay(GeometryReader { geo in
                                     Color.clear
@@ -216,20 +252,22 @@ private extension GameView {
                             }
                     }
                 }
-                .frame(width: 75, height: 75)
+                .frame(width: placedLetters.count >= 10 ? 55 : 75, height: 75)
                 .gridCellUnsizedAxes([.horizontal, .vertical])
             }
-            Grid {
+            // Lettres à placer
+            Grid(alignment: .center, horizontalSpacing: orderedLetters.count >= 10 ? 0.1 : 10) {
                 GridRow {
                     ForEach($orderedLetters, id: \.id) { $letter in
                         if (letter.isShown) {
                             Text("\(letter.text)")
+                                .font(Font.system(size: placedLetters.count >= 10 ? 12 : 20))
                                 .foregroundStyle(.black)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .multilineTextAlignment(.center)
                                 .padding()
                                 .zIndex(letter.offset == .zero ? 0 : 1)
-                                .frame(width: 50, height: 50)
+                                .frame(width: orderedLetters.count >= 10 ? 40 : 50, height: orderedLetters.count >= 10 ? 40 : 50)
                                 .background(letterRec(letter: $letter))
                                 .offset(letter.offset)
                                 .gesture(
@@ -250,12 +288,15 @@ private extension GameView {
                         }
                     }
                 }
-                .frame(width: 75, height: 75)
+                .frame(width: orderedLetters.count >= 10 ? 55 : 75, height: 75)
                 .gridCellUnsizedAxes([.horizontal, .vertical])
             }
+            
         }
     }
     
+    /// Met à jour la lettre qui a été taper
+    /// - Parameter letter: Letter taper
     func letterTapped(letter: Letter) {
         if (letter.text != " ") {
             let match = orderedLetters.firstIndex(where: { $0.text == letter.text && !$0.isShown})
@@ -264,6 +305,12 @@ private extension GameView {
         }
     }
     
+    /// Vérification lorsqu'un lettre est bougé
+    /// - Parameters:
+    ///   - location: Location de la lettre
+    ///   - letter: Lettre qui est bougé
+    ///   - dropped: Booléen indiquant si la lettre est drop ou non
+    /// - Returns: Retourne l'état du drag
     func letterMoved(location: CGPoint, letter: Letter, dropped: Bool = false) -> DragState {
         if let match = buttonFrame.firstIndex(where: {
             $0.contains(location) }) {
@@ -273,6 +320,7 @@ private extension GameView {
                         for i in 0..<orderedLetters.count {
                             if (orderedLetters[i].text == placedLetters[match].text && !orderedLetters[i].isShown) {
                                 orderedLetters[i].isShown = true
+                                break
                             }
                         }
                     }
@@ -290,6 +338,11 @@ private extension GameView {
         }
     }
     
+    /// Fond des lettres
+    /// - Parameters:
+    ///   - letter: Lettres
+    ///   - fix: Booléen indiquant si la lettre peut bouger
+    /// - Returns: Un carré
     func letterRec(letter: Binding<Letter>, fix: Bool = false) -> some View {
         GeometryReader { geometry in
             RoundedRectangle(cornerSize: CGSize(width: 10, height: 10))
@@ -297,12 +350,14 @@ private extension GameView {
                 .shadow(radius: 3)
                 .shadow(color: getDragColor(state: letter.wrappedValue.dragState, fix: fix)
                         , radius: letter.wrappedValue.offset == .zero ? 0 : 10)
-                .onAppear {
-                    letter.lastOffset.wrappedValue = geometry.frame(in: .local)
-                }
         }
     }
     
+    /// Retourne la couleur selon le dragState
+    /// - Parameters:
+    ///   - state: État du drag
+    ///   - fix: Booléen indiquant si la lettre peut bouger
+    /// - Returns: Color selon son état
     func getDragColor(state: DragState, fix: Bool) -> Color {
         if fix { return .clear }
         switch state {

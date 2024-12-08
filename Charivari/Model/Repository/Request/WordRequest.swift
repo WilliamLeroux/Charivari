@@ -5,6 +5,8 @@
 //  Created by William Leroux on 2024-12-04.
 //
 
+
+/// Structure comprenant toute les requêtes SQL pour la table des mots
 struct WordRequest {
     static let CREATE_TABLE =   "CREATE TABLE IF NOT EXISTS words (id INTEGER PRIMARY KEY AUTOINCREMENT, word TEXT NOT NULL, secret TEXT NOT NULL);"
     static let INSERT_WORD =    "INSERT INTO words (word, secret) VALUES (?, ?);"

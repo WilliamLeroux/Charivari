@@ -120,7 +120,7 @@
         }
       }
     },
-    "hard" : {
+    "Hard" : {
       "localizations" : {
         "fr-CA" : {
           "stringUnit" : {
@@ -129,6 +129,12 @@
           }
         }
       }
+    },
+    "Hint" : {
+
+    },
+    "Hint: %lld/3" : {
+
     },
     "La recherche de score est vide" : {
       "localizations" : {
@@ -165,6 +171,9 @@
           }
         }
       }
+    },
+    "No more hints left" : {
+
     },
     "Ok" : {
       "localizations" : {

@@ -8,29 +8,19 @@
 import SwiftUI
 import UIKit
 
+/// Structure représentant la vue du menu
 struct MenuView: View {
-    @ObservedObject var bgManager = BackgroundManager.shared
-    private var timer = TimerManager.shared
-    @State var isPlaying = false
-    @State var inRanking = false
-    private var game = GameManager.shared
-    @State private var orderedLetters: [Letter] = []
-    @State private var placedLetters: [Letter] = []
-    @State private var buttonFrame: [CGRect] = []
-    @State private var name: String = ""
-    @ObservedObject var network : NetworkMonitor
-    @State private var noName: Bool = true
+    @ObservedObject var bgManager = BackgroundManager.shared /// Gestionnaire du background
+    @ObservedObject var network : NetworkMonitor /// Gestionnaire du réseau
+    @State private var name: String = "" /// Nom du joueur
+    @State private var noName: Bool = true /// Booléen indiquant si le joueur a du réseau
+    private var timer = TimerManager.shared /// Gestionnaire du timer
+    private var game = GameManager.shared /// Gestionnaire du jeu
     
     init(network: NetworkMonitor) {
         self.network = network
         network.delegate = game
-        game.pickNewWord()
-        orderedLetters = game.orderedLetters
         game.checkDatabase()
-        for letter in orderedLetters{
-            placedLetters.append(Letter(id: letter.id, text: " ", offset: .zero))
-            buttonFrame.append(.zero)
-        }
     }
     
     var body: some View {
@@ -64,7 +54,7 @@ struct MenuView: View {
                     
                     
                     NavigationLink("Play") {
-                        GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters, buttonFrame: buttonFrame).navigationBarBackButtonHidden(true)
+                        GameView().navigationBarBackButtonHidden(true)
                     }
                     .font(.title)
                     .foregroundStyle(.white)
@@ -94,14 +84,13 @@ struct MenuView: View {
                         submit()
                     })
                 }
-                .navigationDestination(for: String.self) { string in
-                    GameView(game: game, orderedLetters: orderedLetters, placedLetters: placedLetters, buttonFrame: buttonFrame).navigationBarBackButtonHidden(true)
-                }
             }.onAppear{
                 self.$noName.wrappedValue = !game.hasName()
             }
         }
     }
+    
+    /// Envoie le nom de l'utilisateur
     func submit() {
         if (name.isEmpty) {
             noName.toggle()
@@ -117,7 +106,7 @@ struct MenuView: View {
 }
 
 private extension MenuView {
-    var backgroundVw: some View {
+    var backgroundVw: some View { /// Background
         Image(bgManager.getBackgroundImage(id: self.bgManager.backgroundId))
             .resizable()
             .scaledToFill()

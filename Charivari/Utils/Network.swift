@@ -1,5 +1,5 @@
 //
-//  Network.swift
+//  NetworkMonitor.swift
 //  Charivari
 //
 //  Created by William Leroux on 2024-11-28.
@@ -7,13 +7,13 @@
 
 import SwiftUI
 import Network
+
+/// Classe s'occupant du réseau
 class NetworkMonitor : ObservableObject{
-    
-    static let shared = NetworkMonitor()
-    
-    private let monitor = NWPathMonitor()
-    @Published var connected = false
-    weak var delegate: NetworkDelegate?
+    static let shared = NetworkMonitor() /// Singleton
+    private let monitor = NWPathMonitor() /// Moniteur du réseau
+    @Published var connected = false /// Booléen indiquant si l'utilisateur à du réseau
+    weak var delegate: NetworkDelegate? /// Délégué
     
     init() {
         performInitialCheck()
@@ -35,11 +35,13 @@ class NetworkMonitor : ObservableObject{
         monitor.start(queue: queue)
     }
     
+    
+    /// Effectue une vérification du réseau au lancement de l'application
     func performInitialCheck() {
         let monitor = NWPathMonitor()
         let semaphore = DispatchSemaphore(value: 0)
         var initialConnected = false
-        let queue = DispatchQueue.global(qos: .background)
+        let queue = DispatchQueue(label: "NetworkMonitorQueue")
         
         monitor.pathUpdateHandler = { path in
             initialConnected = (path.status == .satisfied)
@@ -52,12 +54,5 @@ class NetworkMonitor : ObservableObject{
          monitor.cancel()
         
          self.connected = initialConnected
-    }
-    
-    /// Retrieves the current network state.
-    ///
-    /// - Returns: A boolean value indicating the network state (connected or not).
-    func getNetworkState() -> Bool {
-        return connected
     }
 }

@@ -7,9 +7,10 @@
 
 import SwiftUI
 
+/// Gestionnaire du fond d'écran
 class BackgroundManager: ObservableObject {
-    static let shared = BackgroundManager()
-    @Published var backgroundId: Int
+    static let shared = BackgroundManager() /// Singleton
+    @Published var backgroundId: Int /// Background actuel
     
     init() {
         if (UserDefaults.standard.object(forKey: "bgId") != nil) {
@@ -19,11 +20,17 @@ class BackgroundManager: ObservableObject {
         }
     }
     
+    
+    /// Change le fond d'écran actuel
+    /// - Parameter id: Id du background
     func setBackgroundId(id: Int) {
         backgroundId = id
         UserDefaults.standard.set(id, forKey: "bgId")
     }
     
+    /// Retourne le fond d'écran actuel
+    /// - Parameter id: Id du background
+    /// - Returns: Image du background en ImageRessource
     func getBackgroundImage(id: Int) -> ImageResource {
         switch id {
             case 0 : return .background

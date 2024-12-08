@@ -8,21 +8,23 @@
 import SQLite3
 import Foundation
 
+
+/// Gestionnaire de la base de données
 class WordDatabaseManager {
-    private var db: OpaquePointer?
-    static let shared = WordDatabaseManager()
-    var count: Int = 0
+    private var db: OpaquePointer? /// Pointeur de la bd
+    static let shared = WordDatabaseManager() /// Singleton
+    var count: Int = 0 /// Compteur du nombre d'entré dans la base de données
     
     init() {
         setupDatabase()
     }
     
+    /// Initialise la base de données
     private func setupDatabase() {
         let dbUrl = FileManager.default.temporaryDirectory.appendingPathComponent("word.sqlite")
         
         if (sqlite3_open(dbUrl.path(), &db) == SQLITE_OK) {
             if (sqlite3_exec(db, WordRequest.CREATE_TABLE.description, nil, nil, nil) == SQLITE_OK) {
-                print("Database setup successful")
             } else {
                 print("Error setting up database: \(String(describing: (sqlite3_errmsg(db))))")
             }
@@ -30,13 +32,14 @@ class WordDatabaseManager {
         
         if (sqlite3_open(dbUrl.path(), &db) == SQLITE_OK) {
             if (sqlite3_exec(db, ScoreRequest.CREATE_TABLE.description, nil, nil, nil) == SQLITE_OK) {
-                print("Database setup successful")
             } else {
                 print("Error setting up database: \(String(describing: (sqlite3_errmsg(db))))")
             }
         }
     }
     
+    /// Ajoute un mot à la base de données
+    /// - Parameter word: Le mot à rajouter
     func insertWord(word: Word) {
         var insertStatement: OpaquePointer?
         
@@ -54,6 +57,9 @@ class WordDatabaseManager {
         sqlite3_finalize(insertStatement)
     }
     
+    /// Retourne un mot selon son id
+    /// - Parameter id: id du mot
+    /// - Returns: Mot
     func getWord(id: Int) -> (word: Word?, id: Int) {
         var selectStatement: OpaquePointer?
         
@@ -74,6 +80,8 @@ class WordDatabaseManager {
         return (Word(Word: "", Secret: "", Error: ""), id: -1)
     }
     
+    /// Supprime un mot selon son id
+    /// - Parameter id: Id du mot
     func deleteWord(id: Int) {
         var deleteStatement: OpaquePointer?
         
@@ -85,6 +93,8 @@ class WordDatabaseManager {
         sqlite3_finalize(deleteStatement)
     }
     
+    /// Retourne le plus petit id qu'il y a
+    /// - Returns: Int contenant l'id
     func getLowestId() -> Int {
         var selectStatement: OpaquePointer?
         
@@ -100,6 +110,8 @@ class WordDatabaseManager {
         return -1
     }
     
+    /// Retourne le plus gros id
+    /// - Returns: Int contenant l'id
     func getHighestId() -> Int {
         var selectStatement: OpaquePointer?
         
@@ -116,6 +128,8 @@ class WordDatabaseManager {
         return -1
     }
     
+    /// Compte le nombre d'enregistrement dans la bd
+    /// - Returns: Int contenant le nombre totale d'enregistrement
     func getCount() -> Int {
         var selectStatement: OpaquePointer?
         
@@ -135,6 +149,8 @@ class WordDatabaseManager {
     
     // MARK: Score table
     
+    /// Ajoute un score à la tables des Scores
+    /// - Parameter game: Score à rajouter
     func insertScore(game: Game) {
         var insertStatement: OpaquePointer?
         
@@ -142,19 +158,22 @@ class WordDatabaseManager {
             let nsWord : NSString = game.word!.Word as NSString
             let nsSectet : NSString = game.word!.Secret as NSString
             let nsUsername : NSString = game.username as NSString
+            
             sqlite3_bind_text(insertStatement, 1, nsWord.utf8String, -1, nil)
             sqlite3_bind_text(insertStatement, 2, nsSectet.utf8String, -1, nil)
             sqlite3_bind_int64(insertStatement, 3, Int64(game.time))
             sqlite3_bind_text(insertStatement, 4, nsUsername.utf8String, -1, nil)
+            
             if (sqlite3_step(insertStatement) != SQLITE_DONE) {
                 print("Error inserting word: \(String(describing: (sqlite3_errmsg(db))))")
                 return
             }
         }
-        count += 1
         sqlite3_finalize(insertStatement)
     }
     
+    /// Retourne tout les scores
+    /// - Returns: Tableau de game représentant tout les scores
     func getAllScore() -> [Game] {
         var statement: OpaquePointer?
         
@@ -175,6 +194,8 @@ class WordDatabaseManager {
         return []
     }
     
+    /// Supprime un score selon son id
+    /// - Parameter id: Id du score
     func deleteScore(id: Int) {
         var deleteStatement: OpaquePointer?
         
@@ -188,6 +209,7 @@ class WordDatabaseManager {
     
     // MARK: DEBUG
     
+    /// DEBUG SEULEMENT supprime tout les scores
     func deleteAllScore() {
         var deleteStatement: OpaquePointer?
         
@@ -197,6 +219,7 @@ class WordDatabaseManager {
         }
     }
     
+    /// DEBUG SEULEMENT supprime tout les mots
     func deleteAllWord() {
         var deleteStatement: OpaquePointer?
         
@@ -206,6 +229,7 @@ class WordDatabaseManager {
         }
     }
     
+    /// DEBUG SEULEMENT affiche tout les scores
     func printAllScore() {
         var statement: OpaquePointer?
         
@@ -220,6 +244,7 @@ class WordDatabaseManager {
         }
     }
     
+    /// DEBUG SEULEMENT affiche tout les mots
     func printAllWord() {
         var statement: OpaquePointer?
         
