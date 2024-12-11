@@ -253,7 +253,7 @@ private extension GameView {
                                 }
                             )
                             .onTapGesture {
-                                withAnimation(.easeInOut) {
+                                withAnimation(.spring()) {
                                     letterTapped(letter: letter)
                                 }
                             }
@@ -280,13 +280,13 @@ private extension GameView {
                                 .gesture(
                                     DragGesture(coordinateSpace: .global)
                                         .onChanged { drag in
-                                            withAnimation(.easeIn) {
+                                            withAnimation(.bouncy(extraBounce: 0.3)) {
                                                 letter.offset = CGSize(width: drag.translation.width, height: drag.translation.height)
                                                 letter.dragState = letterMoved(location: CGPoint(x: drag.location.x, y: drag.location.y), letter: letter)
                                             }
                                         }
                                         .onEnded { drag in
-                                            withAnimation(.easeInOut){
+                                            withAnimation(.bouncy(extraBounce: 0.3)){
                                                 letter.dragState = letterMoved(location: CGPoint(x: drag.location.x, y: drag.location.y), letter: letter, dropped: true)
                                                 letter.offset = .zero
                                             }
@@ -331,7 +331,9 @@ private extension GameView {
                             }
                         }
                     }
+                    
                     placedLetters[match].text = letter.text
+                    
                     orderedLetters[letter.id].isShown = false
                     gameFinished = game.checkWord(letterArray: placedLetters)
                     if (gameFinished) {

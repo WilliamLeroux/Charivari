@@ -110,6 +110,22 @@
         }
       }
     },
+    "Error_Network_Message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You don’t have Internet"
+          }
+        },
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous n’êtes pas connecté à Internet"
+          }
+        }
+      }
+    },
     "Give up" : {
       "localizations" : {
         "fr-CA" : {
@@ -182,6 +198,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nom"
+          }
+        }
+      }
+    },
+    "Network error!" : {
+      "localizations" : {
+        "fr-CA" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de connexion"
           }
         }
       }
