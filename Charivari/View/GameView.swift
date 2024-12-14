@@ -103,9 +103,10 @@ struct GameView: View {
         }
         .onAppear {
             if (game.hasWord()) {
-                game.pickNewWord()
-            } else {
                 game.reloadWord()
+                timer.stop()
+            } else {
+                game.pickNewWord()
             }
             orderedLetters = game.orderedLetters
             placedLetters.removeAll()

@@ -25,13 +25,11 @@ class GameManager : ObservableObject, NetworkDelegate{
         game = Game(username: "", time: 0.0, isFound: false)
         if let username = UserDefaults.standard.string(forKey: "username") {
             game.username = username
-            saveWord()
-            print("Username: \(username)")
         }
         if let difficulty = UserDefaults.standard.string(forKey: "difficulty") {
             self.difficulty = difficulty
-            saveWord()
         }
+        reloadWord()
     }
     
     /// Vérifie si la base de données contient 100 mots
